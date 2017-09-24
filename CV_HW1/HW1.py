@@ -120,6 +120,7 @@ def p2(binary_in):  # return labels_out
     ls.sort()
 
 
+
     for k in range(len(ls)):  # Create Eq_Table
         if ls[k][0] in dic:
             dic[ls[k][1]] = dic.get(ls[k][0])
@@ -129,7 +130,7 @@ def p2(binary_in):  # return labels_out
             group = group + 1
             dic[ls[k][0]] = group
             dic[ls[k][1]] = group
-            print k
+            #print k
 
     # c.sort()
     # b.sort()
@@ -145,15 +146,23 @@ def p2(binary_in):  # return labels_out
 
     # print b;
     # print c;
-    for i in dic.values():
-        if i==3:
-            print "a"
+    # for i in dic.values():
+    #     if i==3:
+    #         print "a"
+    #
+    # print ls[103]
+    # print ls[104]
+    # print ls[105]
 
-    print ls[103]
-    print ls[104]
-    print ls[105]
+    #print dic.values()
+    aa=[]
+    for [m,n] in ls:
+        if(dic.get(m)==1):
+            aa.append(m)
+        if(dic.get(n)==1):
+            aa.append(n)
 
-    print dic.values()
+    print aa
     return a;
 
 ###### test p2 #######
