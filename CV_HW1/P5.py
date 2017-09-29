@@ -23,8 +23,8 @@ def p5(image_in): #return edge_image_out
                    [-2, -3, -5, -3, -2],
                    [-1, -2, -3, -2, -1]])
 
-    i = 2
-    j = 2
+    i = 3
+    j = 3
     print (image[i-1:i+2, j-1:j+2] * sobel_x).sum()
     print (image[i-1:i+2, j-1:j+2] * sobel_y).sum()
     print image[i-1:i+2, j-1:j+2]
