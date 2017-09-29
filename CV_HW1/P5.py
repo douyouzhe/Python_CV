@@ -1,14 +1,16 @@
 import numpy as np
+np.set_printoptions(threshold=np.nan)
 import cv2
-import scipy.ndimage as nd
 import matplotlib.pyplot as plt
 
 
 
 def p5(image_in): #return edge_image_out
 
-    image = cv2.imread(image_in, 0)
+    image = cv2.imread(image_in,0)
     row, col = image.shape
+    sobel_x = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
+    sobel_y = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
 
     sobelCol = np.array([[-1, -2, 0, 2, 1],
                    [-2, -3, 0, 3, 2],
@@ -20,37 +22,44 @@ def p5(image_in): #return edge_image_out
                    [0, 0, 0, 0, 0],
                    [-2, -3, -5, -3, -2],
                    [-1, -2, -3, -2, -1]])
-    out1 = np.zeros((row,col))
-    out2 = np.zeros((row, col))
-    for i in range(2, row-2):
-        for j in range(2, col-2):
-            val = sobelCol*image[(i-2):(i+3),(j-2):(j+3)]
-            out1[i,j] = min(255,max(0,val.sum()))
-    for i in range(2, row-2):
-        for j in range(2, col-2):
-            val = sobelRow*image[(i-2):(i+3),(j-2):(j+3)]
-            out2[i,j] = min(255,max(0,val.sum()))
+
+    i = 2
+    j = 2
+    print (image[i-1:i+2, j-1:j+2] * sobel_x).sum()
+    print (image[i-1:i+2, j-1:j+2] * sobel_y).sum()
+    print image[i-1:i+2, j-1:j+2]
+
+    # for i in range(2,row-3):
+    #     for j in range(2,col-3):
+    #         print j
+            #print (sobelCol * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
 
 
-    out1 = out1.astype(np.int8)
-    out2 = out2.astype(np.int8)
-    out = np.zeros((row,col))
-
-    out=np.hypot(out1,out2)
-    out = out.astype(np.int8)
-    for i in range(row):
-        for j in range(col):
-            out[i,j]= 255-out[i,j]
 
 
-    return out
+
+
+
+
+    # out1 = np.zeros((row, col))
+    # out2 = np.zeros((row, col))
+    # out = np.zeros((row, col))
+    #
+    # for i in range(2, row-2):
+    #     for j in range(2, col-2):
+    #         out1[i, j] = (sobelCol * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
+    #         out2[i, j] = (sobelRow * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
+    #         out [i,j] = abs(out1[i, j])+ abs(out2[i, j])
+    # print out
+    #
+    # return out
 
 
 
 
 ###### test #######
 pic = p5('hough_simple_2.pgm')
-cv2.imshow('image',pic)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('image', pic)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 # cv2.imwrite("111.pgm", pic)
