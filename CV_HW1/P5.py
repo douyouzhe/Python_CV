@@ -3,8 +3,6 @@ np.set_printoptions(threshold=np.nan)
 import cv2
 import matplotlib.pyplot as plt
 
-
-
 def p5(image_in): #return edge_image_out
 
     image = cv2.imread(image_in,0)
