@@ -5,10 +5,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-
-
-
-
 def p6(edge_image, edge_thresh): # return [edge_thresh_image, hough_image]
 
     image = cv2.imread(edge_image, 0)
@@ -30,7 +26,7 @@ def p6(edge_image, edge_thresh): # return [edge_thresh_image, hough_image]
     sin_t = np.sin(thetas)
     num_thetas = len(thetas)
 
-    accumulator = np.zeros((diag_len, num_thetas), dtype=np.uint8)
+    accumulator = np.zeros((2*diag_len, num_thetas), dtype=np.float64)
     y_idxs, x_idxs = np.nonzero(edge_thresh_out)
 
     for i in range(len(x_idxs)):
@@ -39,7 +35,7 @@ def p6(edge_image, edge_thresh): # return [edge_thresh_image, hough_image]
 
         for t_idx in range(num_thetas):
             # Calculate rho. diag_len is added for a positive index
-            rho = int(x * cos_t[t_idx] + y * sin_t[t_idx])
+            rho = int(x * cos_t[t_idx] + y * sin_t[t_idx]) + diag_len
             accumulator[rho, t_idx] += 1
 
     #return accumulator, thetas, rhos
@@ -72,11 +68,11 @@ def p6(edge_image, edge_thresh): # return [edge_thresh_image, hough_image]
 
 
 ###### test #######
-pic, houghOut = p6('edge_2_result.pgm',40)
+pic, houghOut = p6('edge_2_result.pgm',120)
 plt.imshow(houghOut)
 plt.show()
 # cv2.imshow('image',houghOut)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
-# cv2.imwrite("edge_thresh_2_result.pgm", pic)
-#cv2.imwrite("hough_image_2_result.pgm", houghOut)
+cv2.imwrite("edge_thresh_2_result.pgm", pic)
+cv2.imwrite("hough_image_2_result.pgm", houghOut)
