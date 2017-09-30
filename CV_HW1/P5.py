@@ -9,57 +9,50 @@ def p5(image_in): #return edge_image_out
 
     image = cv2.imread(image_in,0)
     row, col = image.shape
-    sobel_x = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
-    sobel_y = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
+    out1 = np.zeros((row, col))
+    out2 = np.zeros((row, col))
+    out = np.zeros((row, col),np.uint8)
 
-    sobelCol = np.array([[-1, -2, 0, 2, 1],
-                   [-2, -3, 0, 3, 2],
-                   [-3, -5, 0, 5, 3],
-                   [-2, -3, 0, 3, 2],
-                   [-1, -2, 0, 2, 1]])
-    sobelRow = np.array([[1, 2, 3, 2, 1],
-                   [2, 3, 5, 3, 2],
-                   [0, 0, 0, 0, 0],
-                   [-2, -3, -5, -3, -2],
-                   [-1, -2, -3, -2, -1]])
+    sobelCol = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]
+    sobelRow = [[1, 2, 1], [0, 0, 0], [-1, -2, -1]]
 
-    i = 3
-    j = 3
-    print (image[i-1:i+2, j-1:j+2] * sobel_x).sum()
-    print (image[i-1:i+2, j-1:j+2] * sobel_y).sum()
-    print image[i-1:i+2, j-1:j+2]
-
-    # for i in range(2,row-3):
-    #     for j in range(2,col-3):
-    #         print j
-            #print (sobelCol * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
+    for i in range(1, row-1):
+        for j in range(1, col-1):
+            out1[i, j] = (sobelCol * image[(i - 1):(i + 2), (j - 1):(j + 2)]).sum()
+            out2[i, j] = (sobelRow * image[(i - 1):(i + 2), (j - 1):(j + 2)]).sum()
+            out[i, j] = abs(out1[i, j]) + abs(out2[i, j])
 
 
-
-
-
-
-
-
-    # out1 = np.zeros((row, col))
-    # out2 = np.zeros((row, col))
-    # out = np.zeros((row, col))
+    # sobelCol = np.array([[-1, -2, 0, 2, 1],
+    #                [-2, -3, 0, 3, 2],
+    #                [-3, -5, 0, 5, 3],
+    #                [-2, -3, 0, 3, 2],
+    #                [-1, -2, 0, 2, 1]])
+    # sobelRow = np.array([[1, 2, 3, 2, 1],
+    #                [2, 3, 5, 3, 2],
+    #                [0, 0, 0, 0, 0],
+    #                [-2, -3, -5, -3, -2],
+    #                [-1, -2, -3, -2, -1]])
     #
     # for i in range(2, row-2):
     #     for j in range(2, col-2):
     #         out1[i, j] = (sobelCol * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
     #         out2[i, j] = (sobelRow * image[(i - 2):(i + 3), (j - 2):(j + 3)]).sum()
-    #         out [i,j] = abs(out1[i, j])+ abs(out2[i, j])
-    # print out
-    #
-    # return out
+    #         val = abs(out1[i, j]) + abs(out2[i, j])
+    #         out[i, j] =[val,val,val]
 
-
+    return out
 
 
 ###### test #######
-pic = p5('hough_simple_2.pgm')
-# cv2.imshow('image', pic)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# cv2.imwrite("111.pgm", pic)
+pic = p5('hough_simple_1.pgm')
+# plt.imshow(pic)
+# plt.show()
+cv2.imshow('image',pic)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+# cv2.imwrite("edge_1_result.pgm", pic)
+# pic = p5('hough_simple_2.pgm')
+# cv2.imwrite("edge_2_result.pgm", pic)
+# pic = p5('hough_complex_1.pgm')
+# cv2.imwrite("edge_3_result.pgm", pic)
