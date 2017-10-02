@@ -10,7 +10,7 @@ def p7(image, hough_image, hough_thresh):
     lines = []
     for i in range(len(hough_image)):
         for j in range(len(hough_image[0])):
-            if hough_image[i, j, 0]> 200:
+            if hough_image[i, j, 0]> hough_thresh:
                 lines.append((i, j))
 
     for line in lines:
@@ -26,8 +26,3 @@ def p7(image, hough_image, hough_thresh):
             cv2.line(image, pt1, pt2, (255))
     return image
 
-###### test #######
-pic = p7('hough_simple_2.pgm','hough_image_2_result.pgm',150)
-cv2.imshow('image',pic)
-cv2.waitKey(0)
-# cv2.imwrite("p7_result.pgm", pic)

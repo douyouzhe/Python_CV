@@ -41,16 +41,3 @@ def p5(image_in): #return edge_image_out
 
     return out
 
-
-###### test #######
-pic = p5('hough_simple_1.pgm')
-# plt.imshow(pic)
-# plt.show()
-cv2.imshow('image',pic)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-# cv2.imwrite("edge_1_result.pgm", pic)
-# pic = p5('hough_simple_2.pgm')
-# cv2.imwrite("edge_2_result.pgm", pic)
-# pic = p5('hough_complex_1.pgm')
-# cv2.imwrite("edge_3_result.pgm", pic)

@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
 
 def p2(binary_in):  # return labels_out
@@ -66,7 +67,7 @@ def p2(binary_in):  # return labels_out
             dic[ls[k][0]] = dic.get(ls[k][1])
         #both not found, create new label
         else:
-            group = group + 100
+            group = group + 20
             dic[ls[k][0]] = group
             dic[ls[k][1]] = group
     row,col = a.shape
@@ -79,8 +80,10 @@ def p2(binary_in):  # return labels_out
     return pic
 
 ###### test #######
-pic = p2('binaryImage.pgm')
-cv2.imshow('labeled image', pic)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-cv2.imwrite("newLabel.pgm", pic)
+# pic = p2('binaryImage.pgm')
+# cv2.imshow('labeled image', pic)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+# plt.imshow(pic)
+# plt.show()
+# cv2.imwrite("newLabel.pgm", pic)

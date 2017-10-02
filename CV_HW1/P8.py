@@ -9,13 +9,10 @@ def p8(image, hough_image, edge_thresh_image, hough_thresh):#return cropped_line
     image = cv2.imread(image)
     hough_image = cv2.imread(hough_image)
     edge_thresh_image = cv2.imread(edge_thresh_image,0)
-    ret, thresh1 = cv2.threshold(edge_thresh_image, 50, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(edge_thresh_image, 40, 255, cv2.THRESH_BINARY)
     row,col = edge_thresh_image.shape
     lines=[]
     step = 60
-    # plt.imshow(thresh1)
-    # plt.show()
-    np.linspace(2.0, 3.0, num=5)
     for i in range(len(hough_image)):
         for j in range(len(hough_image[0])):
             if hough_image[i, j, 0]> hough_thresh:
@@ -52,20 +49,17 @@ def p8(image, hough_image, edge_thresh_image, hough_thresh):#return cropped_line
             steps2 = np.linspace(pt1[1], pt2[1] - 1, num=step, endpoint=False)
             steps1 = np.linspace(0, col - 1, num=step, endpoint=False)
             for i in range(len(steps1) - 1):
+
                 x = int(steps1[i])
                 y = int(steps2[i])
+                if (y > 479): continue
                 val1 = thresh1[y, x]
                 x = int(steps1[i + 1])
                 y = int(steps2[i + 1])
+                if (y > 479): continue
                 val2 = thresh1[y, x]
                 if val1 == 255 and val2 == 255:
                     cv2.line(image, (int(steps1[i]), int(steps2[i])), (int(steps1[i + 1]), int(steps2[i + 1])), (255))
                     # cv2.line(image, pt1, pt2, (255))
     return image
 
-
-###### test #######
-pic = p8('hough_simple_2.pgm','hough_image_2_result.pgm','edge_2_result.pgm',150)
-cv2.imshow('image',pic)
-cv2.waitKey(0)
-# cv2.imwrite("p7_result.pgm", pic)

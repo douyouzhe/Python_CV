@@ -1,16 +1,15 @@
 import numpy as np
+np.set_printoptions(threshold=np.nan)
 import cv2
 
 def p3(labeled_img):  #return [database_out, overlays_out]
-    image = cv2.imread(labeled_img, 0)
+    image = cv2.imread(labeled_img,0)
     vals = np.unique(image)
     row,col = image.shape
     outterDic = {}
 
-    for k in range(len(vals)-1): #position of the object
-        area = 0
-        xMean = 0
-        yMean = 0
+    for k in range(len(vals)-1):
+        area, xMean ,yMean = 0,0,0
         innerDic ={}
         for i in range(row):
             for j in range(col):
@@ -22,66 +21,43 @@ def p3(labeled_img):  #return [database_out, overlays_out]
         innerDic['Position'] = [xMean/area,yMean/area]
         outterDic[k] = innerDic
 
+    for k in range(len(vals)-1):
 
-    for k in range(len(vals)-1): #orientation of the object
-        b = 0
-        a = 0
-        c = 0
-        iCenter = outterDic[k]['Position'][0]
-        jCenter = outterDic[k]['Position'][1]
+        a,b,c = 0,0,0
+        iCenter = outterDic[k]['Position'][1]
+        jCenter = outterDic[k]['Position'][0]
+
         for i in range(row):
             for j in range(col):
                 if image[i,j]==vals[k+1]:
                     b+=2*(i-iCenter)*(j-jCenter)
                     c+=(i-iCenter)*(i-iCenter)
                     a+=(j-jCenter)*(j-jCenter)
-        theta=np.arctan(float(b/(a-c)))/2
+        theta = np.arctan2(b,a-c)/2.0
         if ((a-c)*np.cos(2*theta)+b*np.sin(2*theta))<0:
             theta = theta + np.pi / 2
+
+
+        thetaTmp = theta + np.pi / 2
+        tmp1 = a * np.sin(theta) * np.sin(theta) - b * np.sin(theta) * np.cos(theta) + c * np.cos(theta) * np.cos(theta)
+        tmp2 = a * np.sin(thetaTmp) * np.sin(thetaTmp) - b * np.sin(thetaTmp) * np.cos(thetaTmp) + c * np.cos(thetaTmp) * np.cos(thetaTmp)
+
+        roundness = tmp1/tmp2
         outterDic[k]['Orientation'] = theta
+        outterDic[k]['Roundness'] = roundness
 
-
-    for k in range(len(vals)-1):
-        min_i=0
-        min_j=0
-        max_i=0
-        max_j=0
-        for i in range(row):
-            for j in range(col):
-               if image[i,j] == vals[k+1] and j==int((i-outterDic[k]['Position'][0])*np.tan(outterDic[k]['Orientation'])+outterDic[k]['Position'][0]):
-                    if min_i==0:
-                        min_i=i
-                        min_j=j
-                        max_i=i
-                        max_j=j
-                    else:
-                        if min_i>=i:
-                            min_i=i
-                        if min_j>=j:
-                            min_j=j
-                        if max_i<=i:
-                            max_i=i
-                        if max_j<=j:
-                            max_j=j
-
-        outterDic[k]['Template_size'] = [min_i,min_j,max_i,max_j]
-
-    print outterDic
-
-
-
-
-    # print dicts;
-    # cv2.circle(labeled_img, (dicts[0]['position'][0], dicts[0]['position'][1]), 10, (0, 0, 255))
-    # cv2.circle(labeled_img, (dicts[1]['position'][0],dicts[1]['position'][1]), 10,(0,0,255))
-    # cv2.line(labeled_img,(dicts[0]['position'][0],dicts[0]['position'][1]),(dicts[0]['position'][0]+50,dicts[0]['position'][1]+int(np.tan(dicts[0]['orientation'])*50)),(0, 0, 255))
-    # cv2.line(labeled_img,(dicts[1]['position'][0],dicts[1]['position'][1]),(dicts[1]['position'][0]+50,dicts[1]['position'][1]+int(np.tan(dicts[1]['orientation'])*50)),(0, 0, 255))
-    # cv2.imshow('test',labeled_img)
+    for i in range(len(outterDic)):
+        cv2.circle(image, (outterDic[i]['Position'][0], outterDic[i]['Position'][1]), 10, (255, 255, 255))
+        cv2.line(image, (outterDic[i]['Position'][0], outterDic[i]['Position'][1]),
+                 (outterDic[i]['Position'][0] + 50, outterDic[i]['Position'][1] + int(np.tan(outterDic[i]['Orientation']) * 50)),
+                 (255, 255, 255))
+    # cv2.imshow('image', image)
     # cv2.waitKey(0)
 
-    return outterDic
+
+    return outterDic, image
 ###### test #######
-pic = p3('newLabel.pgm')
+# pic = p3('newLabel.pgm')
 # cv2.imshow('image',pic)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()

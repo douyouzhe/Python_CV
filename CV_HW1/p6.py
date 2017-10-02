@@ -32,12 +32,3 @@ def p6(edge_image, edge_thresh): # return [edge_thresh_image, hough_image]
     return edge_thresh_out, accumulator
 
 
-###### test #######
-pic, houghOut = p6('edge_2_result.pgm',70)
-# plt.imshow(pic)
-# plt.show()
-# cv2.imshow('image',houghOut)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# cv2.imwrite("edge_thresh_2_result.pgm", pic)
-cv2.imwrite("hough_image_2_result.pgm", houghOut)
