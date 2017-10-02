@@ -11,6 +11,14 @@ def detect_features(image):
     Returns:
         pixel_coords (list of tuples): A list of (row,col) tuples of detected feature locations in the image
     """
+    row, col = image.shape
+    imgNew = image.copy()
+
+
+
+
+
+
     pixel_coords = list()
 
     return pixel_coords
