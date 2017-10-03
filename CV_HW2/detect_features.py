@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-
+import nonmaxsuppts
 
 
 def detect_features(image):
@@ -18,6 +18,7 @@ def detect_features(image):
     row, col = imgNew.shape
     gradMatRow = np.zeros((row, col), np.float64)
     gradMatCol = np.zeros((row, col), np.float64)
+    cornernessMat = np.zeros((row, col), np.float64)
 
     for i in range(1,row-1):
         for j in range(1,col-1):
@@ -41,25 +42,25 @@ def detect_features(image):
     gradMatCol[0, col - 1] = imgNew[0, col - 2] - imgNew[0, col - 1]
     gradMatCol[row - 1, col - 1] = imgNew[row - 1, col - 1] - imgNew[row - 1, col - 2]
 
-    for i in range(row-1):
-        for j in range(col-1):
-            H = np.zeros((2,2),np.float64)
-            H[0, 0] = gradMatCol[i, j] ** 2
-            H[0, 1] = gradMatCol[i, j] * gradMatRow[i, j]
-            H[1, 0] = gradMatCol[i, j] * gradMatRow[i, j]
-            H[1, 1] = gradMatRow[i, j] ** 2
-            print H
-            print ((H[0, 0] + H[1,1]))
-            print math.sqrt(4*H[1,0]*H[0,1]+(H[0,0]-H[1,1])**2)
+    for i in range(1, row-1):
+        for j in range(1,col-1):
+            a = (gradMatCol[(i - 1):(i + 2), (j - 1):(j + 2)]**2).sum()
+            c = (gradMatRow[(i - 1):(i + 2), (j - 1):(j + 2)]**2).sum()
+            b = (gradMatCol[(i - 1):(i + 2), (j - 1):(j + 2)]\
+            * gradMatRow[(i - 1):(i + 2), (j - 1):(j + 2)]).sum()
 
-            EigenVal = 1/2.0*((H[0, 0]+H[1,1])-math.sqrt(4*H[1,0]*H[0,1]+(H[0,0]-H[1,1])**2))
-            #print EigenVal
+            #print a, b, c
 
+            lambda1 = 1/2.0*(a+c+math.sqrt(b**2+(a-c)**2))
+            lambda2 = 1 / 2.0 * (a + c - math.sqrt(b ** 2 + (a - c) ** 2))
+            k = 0.05
+            cornernessMat[i,j] = lambda1*lambda2 - k * (lambda1+lambda2)**2
 
+            #print cornernessMat[i,j]
 
+    pixel_coords=nonmaxsuppts.nonmaxsuppts(cornernessMat,1,2053700411)
 
-
-
+    print len(pixel_coords)
 
     return pixel_coords
 
