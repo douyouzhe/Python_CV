@@ -56,11 +56,7 @@ def detect_features(image):
             k = 0.05
             cornernessMat[i,j] = lambda1*lambda2 - k * (lambda1+lambda2)**2
 
-            #print cornernessMat[i,j]
-
-    pixel_coords=nonmaxsuppts.nonmaxsuppts(cornernessMat,1,2053700411)
-
-    print len(pixel_coords)
+    pixel_coords = nonmaxsuppts.nonmaxsuppts(cornernessMat,1,2053700411)
 
     return pixel_coords
 
