@@ -1,5 +1,5 @@
 import cv2
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 
 def match_features(feature_coords1,feature_coords2,image1,image2):
@@ -15,5 +15,7 @@ def match_features(feature_coords1,feature_coords2,image1,image2):
                                   in feature_coords2 are determined to be matches, the list should contain (4,0).
     """
 	
-    matches = list()    
+    matches = list()
+
+    matches = np.concatenate((image1, image2), axis=1)
     return matches
