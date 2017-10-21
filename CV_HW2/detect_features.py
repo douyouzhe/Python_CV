@@ -43,15 +43,15 @@ def detect_features(image):
     # gradMatCol[0, col - 1] = imgNew[0, col - 2] - imgNew[0, col - 1]
     # gradMatCol[row - 1, col - 1] = imgNew[row - 1, col - 1] - imgNew[row - 1, col - 2]
     #gradMatRow,gradMatCol = np.gradient(imgNew)
-    sobelCol = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-    sobelRow = sobelCol.T
+    sobelCol = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
+    sobelRow = np.array([[-1, -2, -1], [0,0,0], [1, 2,1]])
 
     gradMatCol = cv2.filter2D(src = imgNew, ddepth = cv2.CV_64F, kernel = sobelCol)
     gradMatRow = cv2.filter2D(src = imgNew, ddepth = cv2.CV_64F, kernel = sobelRow)
     Ixx = gradMatCol**2
     Iyy = gradMatRow**2
     Ixy = gradMatCol*gradMatRow
-    offset = int(5 / 2)
+    offset = int(3 / 2)
 
     cornernessMat = np.zeros((row, col), np.float64)
     for y in range(offset, row - offset):
@@ -80,16 +80,18 @@ def detect_features(image):
     #         k = 0.05
     #         cornernessMat[i,j] = lambda1*lambda2 - k * (lambda1+lambda2)**2
     #
-    pixel_coords = nonmaxsuppts.nonmaxsuppts(cornernessMat,2,300000000000)
+
+    maxVal = np.max(cornernessMat)
+    pixel_coords = nonmaxsuppts.nonmaxsuppts(cornernessMat,5,0.15*maxVal)
     print len(pixel_coords)
 
     for ls in pixel_coords:
-        #cv2.circle(img=image, center=(ls[1],ls[0]), radius=10, color=(0, 0, 255))
+        #cv2.circle(img=image, center=(ls[1],ls[0]), radius=5, color=(0, 0, 255))
         image.itemset((ls[0], ls[1], 0), 0)
         image.itemset((ls[0], ls[1], 1), 0)
         image.itemset((ls[0], ls[1], 2), 255)
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
-    return 0
-pic = cv2.imread('bikes1.png')
-out = detect_features(pic)
+    # cv2.imshow('image', image)
+    # cv2.waitKey(0)
+    return pixel_coords
+# pic = cv2.imread('graf1.png')
+# out = detect_features(pic)
