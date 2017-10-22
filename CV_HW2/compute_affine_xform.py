@@ -1,6 +1,6 @@
 # Author: TK
 import cv2
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 
 def compute_affine_xform(matches,features1,features2,image1,image2):

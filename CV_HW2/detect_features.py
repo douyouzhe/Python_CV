@@ -1,11 +1,9 @@
 import cv2
 import numpy as np
-import math
-import matplotlib.pyplot as plt
 import nonmaxsuppts
 
 
-def detect_features(image):
+def detect_features(image, nonmaxsupptsRadius, nonmaxsupptsThreshold):
     """
     Computer Vision 600.461/661 Assignment 2
     Args:
@@ -44,49 +42,29 @@ def detect_features(image):
     # gradMatCol[row - 1, col - 1] = imgNew[row - 1, col - 1] - imgNew[row - 1, col - 2]
     #gradMatRow,gradMatCol = np.gradient(imgNew)
     sobelCol = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-    sobelRow = np.array([[-1, -2, -1], [0,0,0], [1, 2,1]])
+    sobelRow = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
 
     gradMatCol = cv2.filter2D(src = imgNew, ddepth = cv2.CV_64F, kernel = sobelCol)
     gradMatRow = cv2.filter2D(src = imgNew, ddepth = cv2.CV_64F, kernel = sobelRow)
     Ixx = gradMatCol**2
     Iyy = gradMatRow**2
     Ixy = gradMatCol*gradMatRow
-    offset = int(3 / 2)
 
     cornernessMat = np.zeros((row, col), np.float64)
-    for y in range(offset, row - offset):
-        for x in range(offset, col - offset):
-            windowIxx = Ixx[y - offset:y + offset + 1, x - offset:x + offset + 1]
-            windowIxy = Ixy[y - offset:y + offset + 1, x - offset:x + offset + 1]
-            windowIyy = Iyy[y - offset:y + offset + 1, x - offset:x + offset + 1]
-            Sxx = windowIxx.sum()
-            Sxy = windowIxy.sum()
-            Syy = windowIyy.sum()
+    for y in range(1, row - 1):
+        for x in range(1, col - 1):
+            Sxx = Ixx[y - 1:y + 1 + 1, x - 1:x + 1 + 1].sum()
+            Sxy = Ixy[y - 1:y + 1 + 1, x - 1:x + 1 + 1].sum()
+            Syy = Iyy[y - 1:y + 1 + 1, x - 1:x + 1 + 1].sum()
             det = (Sxx * Syy) - (Sxy ** 2)
-            trace = Sxx + Syy
-            cornernessMat[y,x] = det - 0.04 * (trace ** 2)
-
-
-
-    # cornernessMat = np.zeros((row, col), np.float64)
-    # for i in range(1, row-1):
-    #     for j in range(1,col-1):
-    #         a = (gradMatCol[(i - 1):(i + 2), (j - 1):(j + 2)]**2).sum()
-    #         c = (gradMatRow[(i - 1):(i + 2), (j - 1):(j + 2)]**2).sum()
-    #         b = (gradMatCol[(i - 1):(i + 2), (j - 1):(j + 2)]\
-    #         * gradMatRow[(i - 1):(i + 2), (j - 1):(j + 2)]).sum()
-    #         lambda1 = 1/2.0*(a+c+math.sqrt(b**2+(a-c)**2))
-    #         lambda2 = 1 / 2.0 * (a + c - math.sqrt(b ** 2 + (a - c) ** 2))
-    #         k = 0.05
-    #         cornernessMat[i,j] = lambda1*lambda2 - k * (lambda1+lambda2)**2
-    #
+            cornernessMat[y,x] = det - 0.04 * ((Sxx + Syy) ** 2)
 
     maxVal = np.max(cornernessMat)
-    pixel_coords = nonmaxsuppts.nonmaxsuppts(cornernessMat,5,0.15*maxVal)
+    pixel_coords = nonmaxsuppts.nonmaxsuppts(cornernessMat,
+                                             nonmaxsupptsRadius,nonmaxsupptsThreshold*maxVal)
     print len(pixel_coords)
 
     for ls in pixel_coords:
-        #cv2.circle(img=image, center=(ls[1],ls[0]), radius=5, color=(0, 0, 255))
         image.itemset((ls[0], ls[1], 0), 0)
         image.itemset((ls[0], ls[1], 1), 0)
         image.itemset((ls[0], ls[1], 2), 255)

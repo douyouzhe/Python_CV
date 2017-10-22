@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import detect_features
 
 
@@ -17,76 +16,68 @@ def match_features(feature_coords1, feature_coords2, image1, image2):
                                   in feature_coords2 are determined to be matches, the list should contain (4,0).
     """
 
-    window_size = 10
-    dict_feature1 = {}
-    dict_feature2 = {}
+    windowSize = 10
+    dictFeature2To1 = {}
+    dictFeature1To2 = {}
 
     for i in feature_coords1:
-        a = i[0] - window_size
-        b = i[1] - window_size
-        c = i[0] + window_size
-        d = i[1] + window_size
-        temp = image1[a:c, b:d]
-        if (temp.shape != (window_size * 2, window_size * 2)):
-            continue
-        max_p = -1
+        # a = i[0] - windowSize
+        # b = i[1] - windowSize
+        # c = i[0] + windowSize
+        # d = i[1] + windowSize
+        windowIn1 = image1[i[0] - windowSize:i[0] + windowSize, i[1] - windowSize:i[1] + windowSize]
+        if (windowIn1.shape != (windowSize * 2, windowSize * 2)): continue
+        maxVal = -1
         index = [0,0]
-
         for j in feature_coords2:
-            a1 = j[0] - window_size
-            b1 = j[1] - window_size
-            c1 = j[0] + window_size
-            d1 = j[1] + window_size
-            temp1 = image2[a1:c1, b1:d1]
-
-            if (temp1.shape != (window_size * 2, window_size * 2)):
-                continue
-            product = np.mean((temp - temp.mean()) * (temp1 - temp1.mean()))
-            stds = temp.std() * temp1.std()
+            # a1 = j[0] - windowSize
+            # b1 = j[1] - windowSize
+            # c1 = j[0] + windowSize
+            # d1 = j[1] + windowSize
+            windowIn2 = image2[j[0] - windowSize:j[0] + windowSize, j[1] - windowSize:j[1] + windowSize]
+            if (windowIn2.shape != (windowSize * 2, windowSize * 2)): continue
+            product = np.mean((windowIn1 - windowIn1.mean()) * (windowIn2 - windowIn2.mean()))
+            stds = windowIn1.std() * windowIn2.std()
             product /= stds
-            if max_p < product:
-                max_p = product
+            if maxVal < product:
+                maxVal = product
                 index = j
-
-        dict_feature1[i] = index
+        dictFeature2To1[i] = index
 
 
     for i in feature_coords2:
-
-        a = i[0] - window_size
-        b = i[1] - window_size
-        c = i[0] + window_size
-        d = i[1] + window_size
-        temp = image2[a:c, b:d]
-        if (temp.shape != (window_size * 2, window_size * 2)):
-            continue
-        max_p = -1
+        # a = i[0] - windowSize
+        # b = i[1] - windowSize
+        # c = i[0] + windowSize
+        # d = i[1] + windowSize
+        windowIn2 = image2[i[0] - windowSize:i[0] + windowSize, i[1] - windowSize:i[1] + windowSize]
+        if (windowIn2.shape != (windowSize * 2, windowSize * 2)):continue
+        maxVal = -1
         index = [0,0]
         for j in feature_coords1:
-            a1 = j[0] - window_size
-            b1 = j[1] - window_size
-            c1 = j[0] + window_size
-            d1 = j[1] + window_size
-            temp1 = image1[a1:c1, b1:d1]
-            if (temp1.shape != (window_size * 2, window_size * 2)):
-                continue
-            product = np.mean((temp - temp.mean()) * (temp1 - temp1.mean()))
-            stds = temp.std() * temp1.std()
+            # a1 = j[0] - windowSize
+            # b1 = j[1] - windowSize
+            # c1 = j[0] + windowSize
+            # d1 = j[1] + windowSize
+            windowIn1 = image1[j[0] - windowSize:j[0] + windowSize, j[1] - windowSize:j[1] + windowSize]
+            if (windowIn1.shape != (windowSize * 2, windowSize * 2)):continue
+            product = np.mean((windowIn2 - windowIn2.mean()) * (windowIn1 - windowIn1.mean()))
+            stds = windowIn2.std() * windowIn1.std()
             product /= stds
-            if max_p < product:
-                max_p = product
+            if maxVal < product:
+                maxVal = product
                 index = j
-        dict_feature2[i] = index
+        dictFeature1To2[i] = index
 
-    print dict_feature1
-    print dict_feature2
+    print dictFeature2To1
+    print dictFeature1To2
 
     matches = list()
     arr = list()
 
-    for i in dict_feature1.keys():
-        temp = dict_feature1[i]
-        if dict_feature2[temp] == i:
+    for i in dictFeature2To1.keys():
+        temp = dictFeature2To1[i]
+        if dictFeature1To2[temp] == i:
             index1 = feature_coords1.index(i)
             index2 = feature_coords2.index(temp)
             arr.append([index1,index2])
@@ -97,18 +88,16 @@ def match_features(feature_coords1, feature_coords2, image1, image2):
 
 
 pic = cv2.imread('bikes1.png')
-out = detect_features.detect_features(pic)
+out = detect_features.detect_features(pic,20,0.2)
 gray = cv2.cvtColor(pic, cv2.COLOR_RGB2GRAY)
 
 pic1 = cv2.imread('bikes2.png')
-out1 = detect_features.detect_features(pic1)
+out1 = detect_features.detect_features(pic1,20,0.2)
 gray1 = cv2.cvtColor(pic1, cv2.COLOR_RGB2GRAY)
 
 
 results,arr = match_features(out, out1, gray, gray1)
 
-
-print arr
 
 newImage = np.concatenate((pic,pic1),axis= 1)
 offset = pic1.shape[1]

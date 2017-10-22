@@ -1,5 +1,5 @@
 # Author: TK
-from scipy.ndimage import filters, interpolation
+import scipy.ndimage
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
