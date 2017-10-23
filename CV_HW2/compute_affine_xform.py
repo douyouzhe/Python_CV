@@ -21,10 +21,8 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
     
 
     affine_xform = np.zeros((2,3))
-    threeSamplesIn1 = np.zeros((3,3))
-    threeSamplesIn2 = np.zeros((3,3))
-    rnd = 20
-    maxVal = 0
+    rnd = 100
+    maxVote = 0
     for n in range(rnd):
         samplesIndex = random.sample(range(0, len(matches) - 1), 3)
         tmp1 = matches[samplesIndex[0]]
@@ -58,9 +56,6 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
         ATA = np.dot(AT,A)
         ATAAT = np.dot(inv(ATA),AT)
         t = np.dot(ATAAT,b)
-
-        residualsX = 0
-        residualsY = 0
         count = 0
 
         for pairs in matches:
@@ -71,19 +66,8 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
             tmp1 = (t[0]*x11Test+t[1]*y11Test+t[2]-x12Test)**2
             tmp2 = (t[3]*x11Test+t[4]*y11Test+t[5]-y12Test)**2
             if(tmp1<1 and tmp2<1): count+=1
-            # residualsX = residualsX + tmp1
-            # residualsY = residualsY + tmp2
-        if(count>maxVal):
-            maxVal = count
-            affine_xform[0, 0] = t[0]
-            affine_xform[0, 1] = t[1]
-            affine_xform[0, 2] = t[2]
-            affine_xform[1, 0] = t[3]
-            affine_xform[1, 1] = t[4]
-            affine_xform[1, 2] = t[5]
-            # affine_xform[2, 0] = 0
-            # affine_xform[2, 1] = 0
-            # affine_xform[2, 2] = 1
-
-
+        if(count>maxVote):
+            maxVote = count
+            print count
+            affine_xform = t.reshape(2,3)
     return affine_xform

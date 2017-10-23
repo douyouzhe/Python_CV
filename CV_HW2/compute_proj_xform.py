@@ -24,7 +24,7 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
     threeSamplesIn1 = np.zeros((3,3))
     threeSamplesIn2 = np.zeros((3,3))
     rnd = 100
-    maxVal = 0
+    maxVote = 0
     for n in range(rnd):
         correspondences = []
         samplesIndex = random.sample(range(0, len(matches) - 1), 4)
@@ -73,12 +73,9 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
             aList.append(a2)
         A = np.matrix(aList)
         U ,s ,v = np.linalg.svd(A)
-        h = np.reshape(v[8], (3, 3))
+        h = np.reshape(v[s.argmin()], (3, 3))
         h = (1 / h.item(8)) * h
-
-
         count = 0
-
         for pairs in matches:
             x11Test = features1[pairs[0]][1]
             y11Test = features1[pairs[0]][0]
@@ -89,9 +86,8 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
             tmp2 = ((h[1,0]*x11Test+h[1,1]*y11Test+h[1,2])/den-y12Test)**2
             if(tmp1<1 and tmp2<1): count+=1
 
-        if (count > maxVal):
-            print count, maxVal
-            maxVal = count
+        if (count > maxVote):
+            maxVote = count
             proj_xform = h
 
     return proj_xform

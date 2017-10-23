@@ -53,9 +53,6 @@ def match_features(feature_coords1, feature_coords2, image1, image2, windowSize)
                 index = j
         dictFeature1To2[i] = index
 
-    # print dictFeature2To1
-    # print dictFeature1To2
-
     matches = list()
     listInPairs = list()
     for i in dictFeature2To1.keys():
@@ -66,5 +63,5 @@ def match_features(feature_coords1, feature_coords2, image1, image2, windowSize)
             listInPairs.append([index1,index2])
             matches.append(i)
             matches.append(temp)
-
+    print len(matches)
     return matches, listInPairs
