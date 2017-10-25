@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import random
 from numpy.linalg import inv
+import copy
 import matplotlib.pyplot as plt
 
 def compute_affine_xform(matches,features1,features2,image1,image2):
@@ -18,11 +19,11 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
     Returns:
         affine_xform (numpy.ndarray): a 3x3 Affine transformation matrix between the two images, computed using the matches.
     """
-    
 
     affine_xform = np.zeros((2,3))
-    rnd = 100
+    rnd = 1000
     maxVote = 0
+    inliners = final = []
     for n in range(rnd):
         samplesIndex = random.sample(range(0, len(matches) - 1), 3)
         tmp1 = matches[samplesIndex[0]]
@@ -57,7 +58,6 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
         ATAAT = np.dot(inv(ATA),AT)
         t = np.dot(ATAAT,b)
         count = 0
-
         for pairs in matches:
             x11Test = features1[pairs[0]][1]
             y11Test = features1[pairs[0]][0]
@@ -65,9 +65,13 @@ def compute_affine_xform(matches,features1,features2,image1,image2):
             y12Test = features2[pairs[1]][0]
             tmp1 = (t[0]*x11Test+t[1]*y11Test+t[2]-x12Test)**2
             tmp2 = (t[3]*x11Test+t[4]*y11Test+t[5]-y12Test)**2
-            if(tmp1<1 and tmp2<1): count+=1
+            if(tmp1<1 and tmp2<1):
+                count+=1
+                inliners.append(pairs)
         if(count>maxVote):
             maxVote = count
-            print count
             affine_xform = t.reshape(2,3)
-    return affine_xform
+            final = copy.deepcopy(inliners)
+        else:
+            inliners[:] = []
+    return affine_xform, final

@@ -23,7 +23,7 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
     proj_xform = np.zeros((3,3))
     threeSamplesIn1 = np.zeros((3,3))
     threeSamplesIn2 = np.zeros((3,3))
-    rnd = 100
+    rnd = 10000
     maxVote = 0
     for n in range(rnd):
         correspondences = []
@@ -52,15 +52,6 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
         correspondences.append([x21, y21, x22, y22])
         correspondences.append([x31, y31, x32, y32])
         correspondences.append([x41, y41, x42, y42])
-        # A = np.array([[x11, y11, 1, 0, 0, 0, -x12 * x11, -x12 * y11, -x12],
-        #               [0, 0, 0, x11, y11, 1, -y12 * x11, -y12 * y11, -y12],
-        #               [x21, y21, 1, 0, 0, 0, -x22 * x21, -x22 * y21, -x22],
-        #               [0, 0, 0, x21, y21, 1, -y22 * x21, -y22 * y21, -y22],
-        #               [x31, y31, 1, 0, 0, 0, -x32 * x31, -x32 * y31, -x32],
-        #               [0, 0, 0, x31, y31, 1, -y32 * x31, -y32 * y31, -y32],
-        #               [x41, y41, 1, 0, 0, 0, -x42 * x41, -x42 * y41, -x42],
-        #               [0, 0, 0, x41, y41, 1, -y42 * x41, -y42 * y41, -y42]])
-
         aList = []
         for corr in correspondences:
             p1 = np.matrix([corr[0], corr[1], 1])
@@ -72,8 +63,9 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
             aList.append(a1)
             aList.append(a2)
         A = np.matrix(aList)
-        U ,s ,v = np.linalg.svd(A)
-        h = np.reshape(v[s.argmin()], (3, 3))
+        w, v = np.linalg.eig(np.dot(A.T, A))
+        h = v.T[np.argmin(w)]
+        h = np.reshape(h, (3, 3))
         h = (1 / h.item(8)) * h
         count = 0
         for pairs in matches:
@@ -85,9 +77,7 @@ def compute_proj_xform(matches,features1,features2,image1,image2):
             tmp1 = ((h[0,0]*x11Test+h[0,1]*y11Test+h[0,2])/den-x12Test)**2
             tmp2 = ((h[1,0]*x11Test+h[1,1]*y11Test+h[1,2])/den-y12Test)**2
             if(tmp1<1 and tmp2<1): count+=1
-
         if (count > maxVote):
             maxVote = count
             proj_xform = h
-
     return proj_xform
