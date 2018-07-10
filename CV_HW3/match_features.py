@@ -3,6 +3,7 @@ import numpy as np
 def match_features(feature_coords1, feature_coords2, image1, image2, windowSize = None):
     if windowSize == None :
         windowSize = 20
+        
         dictFeature2To1 = {}
         dictFeature1To2 = {}
         image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2GRAY)
